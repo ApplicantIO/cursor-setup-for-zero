@@ -1,0 +1,123 @@
+version: 1
+description: Context-based selection matrix for portable Cursor setup.
+
+sources:
+  memory_bank:
+    path: "cursor-memory-bank-main/.cursor"
+    includes:
+      - "rules/isolation_rules/**"
+      - "commands/**"
+  security_rules:
+    path: "cursor-security-rules-main"
+    includes:
+      - "*.mdc"
+  design_rules:
+    path: "rules-design-bible/.cursor/rules"
+    includes:
+      - "*.mdc"
+  community_guides:
+    path: "cursor-skills-main"
+    includes:
+      - "**/CURSOR.md"
+      - "**/templates/**"
+      - "**/scripts/**"
+  optional_rules_catalog:
+    path: "awesome-cursorrules-main/rules"
+    includes:
+      - "**/*.md"
+      - "**/*.mdc"
+
+global_baseline:
+  always_include:
+    - "security_rules/secure-development-principles.mdc"
+  include_if_ai_agent_workflow:
+    - "memory_bank/rules/isolation_rules/main.mdc"
+  include_if_docs_required:
+    - "docs_blueprint"
+
+profiles:
+  backend_python_fastapi:
+    if:
+      backend: ["python", "fastapi"]
+    include:
+      - "security_rules/secure-dev-python.mdc"
+      - "security_rules/secure-sql-usage.mdc"
+      - "security_rules/path-traversal-prevention.mdc"
+      - "security_rules/ssrf-prevention.mdc"
+      - "security_rules/xxe-prevention.mdc"
+      - "security_rules/secure-mcp-usage.mdc"
+      - "memory_bank/rules/isolation_rules/**"
+      - "community_guides/python/**"
+    exclude:
+      - "security_rules/secure-dev-node.mdc"
+      - "design_rules/11-motion-transitions.mdc"
+    notes: "Use design rules only when project has meaningful UI."
+
+  frontend_react_typescript:
+    if:
+      frontend: ["react", "typescript", "vite", "nextjs"]
+    include:
+      - "security_rules/secure-dev-node.mdc"
+      - "security_rules/secure-development-principles.mdc"
+      - "design_rules/00-core-principles.mdc"
+      - "design_rules/03-layout-spacing.mdc"
+      - "design_rules/04-typography.mdc"
+      - "design_rules/05-colors.mdc"
+      - "design_rules/13-accessibility.mdc"
+      - "design_rules/18-responsiveness-constraints.mdc"
+      - "community_guides/webdesign/**"
+      - "community_guides/testing/**"
+    exclude:
+      - "security_rules/secure-dev-python.mdc"
+
+  fullstack_web:
+    if:
+      frontend: ["yes"]
+      backend: ["yes"]
+    include:
+      - "memory_bank/rules/isolation_rules/**"
+      - "security_rules/secure-development-principles.mdc"
+      - "security_rules/secure-mcp-usage.mdc"
+      - "security_rules/dangerous-flows.mdc"
+      - "design_rules/00-core-principles.mdc"
+      - "design_rules/13-accessibility.mdc"
+      - "design_rules/20-design-judgment.mdc"
+    notes: "Start standard; expand per complexity."
+
+  backend_only_service:
+    if:
+      frontend: ["none", "no"]
+    include:
+      - "memory_bank/rules/isolation_rules/**"
+      - "security_rules/*.mdc"
+    exclude:
+      - "design_rules/*.mdc"
+    notes: "Skip design bible unless admin dashboard/UI exists."
+
+  ui_heavy_product:
+    if:
+      ux_intensity: ["high"]
+    include:
+      - "design_rules/*.mdc"
+      - "community_guides/webdesign/**"
+      - "community_guides/testing/**"
+    notes: "Use full design suite including responsiveness and micro-interactions."
+
+selection_policy:
+  strict_mode:
+    keep_only_explicit_matches: true
+    drop_unmapped_modules: true
+  standard_mode:
+    keep_only_explicit_matches: false
+    include_global_baseline: true
+  minimal_mode:
+    include_only:
+      - "global_baseline"
+      - "one_language_security_rule"
+      - "core_memory_bank_rule"
+
+cleanup_policy:
+  remove_duplicates: true
+  remove_unused_language_rules: true
+  preserve_project_specific_rules: true
+  preserve_existing_docs: true
