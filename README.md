@@ -1,5 +1,7 @@
 # Cursor Setup OS (v1-lite)
 
+Stable release: `v1.0.0`
+
 Portable setup pack for bootstrapping new projects in Cursor with a structured flow:
 
 `Intake -> Select -> Adopt -> Cleanup -> Validate`
